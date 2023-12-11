@@ -1,0 +1,36 @@
+version: '3'
+services:
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: project_test_backend
+    command: sh -c "python3 manage.py migrate --noinput && python3 manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000"
+    restart: always
+    volumes:
+      - .:/backend/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+  frontend:
+    build: 
+      context: ./frontend # Assuming your frontend's Dockerfile is in the 'frontend' directory
+      dockerfile: Dockerfile
+    container_name: project_test_frontend
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+    restart: always
+    volumes:
+      - ./frontend:/www # Map the frontend directory to /app inside the container
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend # This ensures that the backend service starts before the frontend
+
+
+volumes:
+  data:
+
+
